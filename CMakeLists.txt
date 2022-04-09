@@ -7,9 +7,7 @@ include_directories(.)
 
 add_executable(ft_containers
         map.hpp
-        iterator.hpp
         utility.hpp
-        utils.hpp
         node.hpp
 #        stack.hpp
 #        vector.hpp
@@ -43,5 +41,5 @@ add_executable(ft_containers
 #        vector_test/pop_back.cpp
 #        vector_test/reserve.cpp
 #        vector_test/swap.cpp
-        main1.cpp
+        IterMain.cpp
         )

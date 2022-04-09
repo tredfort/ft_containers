@@ -27,13 +27,8 @@ namespace ft {
         typedef typename allocator_type::const_pointer const_pointer;
         typedef typename allocator_type::size_type size_type;
         typedef typename allocator_type::difference_type difference_type;
-
-//        typedef ft::tree_iterator<const key_type, mapped_type, pointer> iterator;
-//        typedef ft::tree_iterator<const key_type, mapped_type, const_pointer> const_iterator;
-
         typedef typename tree_type::iterator iterator;
         typedef typename tree_type::const_iterator const_iterator;
-
         typedef ft::reverse_iterator<iterator> reverse_iterator;
         typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
 
@@ -104,9 +99,9 @@ namespace ft {
 
 		size_type max_size() const { return _tree.max_size(); }
 
-		mapped_type& operator[](const key_type& k)
+		mapped_type& operator[](const key_type& key)
 		{
-			ft::pair<iterator, bool> res = insert(ft::pair<Key, mapped_type>(k, _tree.search(k)->data->second));
+			ft::pair<iterator, bool> res = insert(ft::pair<Key, mapped_type>(key, _tree.search(key)->data->second));
 			return res.first->second;
 		}
 
