@@ -1,220 +1,134 @@
-#include <iostream>
-//#include <vector>
-//#include "vector.hpp"
 #include "map.hpp"
 #include <map>
-#include <sys/time.h>
 
 using std::string;
-using std::endl;
 using std::cout;
+using std::endl;
 
-template <typename T>
-void print(T* vector) {
-    cout << "size: " << vector->size() << endl;
-    cout << "capacity: " << vector->capacity() << endl;
-}
-
-class B {
-public:
-    char *l;
-    int i;
-    B():l(nullptr), i(1) {};
-    B(const int &ex) {
-        this->i = ex;
-        this->l = new char('a');
-    };
-    virtual ~B() {
-        delete this->l;
-        this->l = nullptr;
-    };
-};
-
-class A : public B {
-public:
-    A():B(){};
-    A(const B* ex){
-        this->l = new char(*(ex->l));
-        this->i = ex->i;
-        if (ex->i == -1) throw "n";
+int main()
+{
+    typedef std::map<int, string> st;
+    typedef ft::map<int, string> f;
+    st m1;
+//    f f1;
+//    m1.get_allocator();
+//    f1.get_allocator();
+//
+//    s::value_type::first_type sptr(10);
+//    f::value_type::first_type fptr(sptr);
+//    s::value_type::second_type se("10");
+//    f::value_type::second_type fe(se);
+//    s::pointer p;
+//    s::const_pointer cp;
+////    cp->first;
+//    f::const_pointer cp1;
+////    cp1->first;
+//    s::size_type size(-1);
+//    cout << "size= " << size << endl;
+//    f::size_type size1(-1);
+//    cout << "size= " << size1 << endl;
+//    f::reference ref1();
+////    f::value_type fptr;
+////    sptr.;
+////    fptr.;
+    cout << "pointer equal: " << (sizeof(st::pointer) == sizeof(f::pointer)) << endl;
+    cout << "const_pointer equal: " << (sizeof(st::const_pointer) == sizeof(f::const_pointer)) << endl;
+    cout << "size_type equal: " << (sizeof(st::size_type) == sizeof(f::size_type)) << endl;
+    cout << "difference_type equal: " << (sizeof(st::difference_type) == sizeof(f::difference_type)) << endl;
+    cout << "reference equal: " << (sizeof(st::reference) == sizeof(f::reference)) << endl;
+    cout << "const_reference equal: " << (sizeof(st::const_reference) == sizeof(f::const_reference)) << endl;
+    cout << "key_type equal: " << (sizeof(st::key_type) == sizeof(f::key_type)) << endl;
+    cout << "key_compare equal: " << (sizeof(st::key_compare) == sizeof(f::key_compare)) << endl;
+    cout << "mapped_type equal: " << (sizeof(st::mapped_type) == sizeof(f::mapped_type)) << endl;
+    cout << "value_type equal: " << (sizeof(st::value_type) == sizeof(f::value_type)) << endl;
+    cout << "allocator_type equal: " << (sizeof(st::allocator_type) == sizeof(f::allocator_type)) << endl;
+    std::map<int, string> m2;
+    m1.insert(std::pair<int, string>(1, "A"));
+    m1.insert(std::make_pair(2, "B"));
+    m1.insert(std::make_pair(3, "C"));
+    m1.insert(std::make_pair(4, "D"));
+    m1.insert(std::make_pair(5, "E"));
+    m1.insert(std::make_pair(6, "F"));
+    for (std::map<int, string>::iterator it = m1.begin(), ite = m1.end(); it!=ite; ++it) {
+        cout << "key=" << it->first << " value=" << it->second << endl;
+//        it->first = 777;
+        it->second = "777";
     }
-    ~A() {
-        delete this->l;
-        this->l = nullptr;
-    };
-};
+    for (std::map<int, string>::const_iterator it = m1.begin(), ite = m1.end(); it!=ite; ++it) {
+        cout << "key=" << it->first << " value=" << it->second << endl;
+//        it->first = 777;
+//        it->second = "777";
+    }
+    for (std::map<int, string>::reverse_iterator it = m1.rbegin(), ite = m1.rend(); it!=ite; ++it) {
+        cout << "key=" << it->first << " value=" << it->second << endl;
+//        it->first = 777;
+        it->second = "777";
+    }
+    for (std::map<int, string>::const_reverse_iterator it = m1.rbegin(), ite = m1.rend(); it!=ite; ++it) {
+        cout << "key=" << it->first << " value=" << it->second << endl;
+//        it->first = 777;
+//        it->second = "777";
+    }
+    cout << "size= " << m1.size() << endl << endl;
 
-
-class C {
-    typedef struct s_array {
-        char* _ptr;
-        int _size;
-        int _capacity;
-        s_array(char* ptr, int size, int capacity) : _ptr(ptr), _size(size), _capacity(capacity) {};
-    } t_array;
-public:
-    t_array array;
-    C() : array(nullptr, 1, 2) {
-//        array(nullptr, 1, 2);
-    };
-
-};
-
-time_t timer() {
-    struct timeval start = {};
-    gettimeofday(&start, nullptr);
-    time_t msecs_time = (start.tv_sec * 1000) + (start.tv_usec / 1000);
-    return msecs_time;
-}
-
-
-int main() {
-//    ft::vector<int> v = ft::vector<int>();
-//    cout << "size: " << v._array._size << endl;
-//    cout << "capacity: " << v._array._capacity << endl;
-
-//    std::vector<int>* std = new std::vector<int>();
-//    std->resize(7);
-//    print(std);
-//    ft::vector<int>* ft = new ft::vector<int>();
-//    ft->resize(7);
-//    print(ft);
-
-//int _ratio = 10000;
-//    ft::vector<int> vector;
-//    std::vector<int> v;
-//    vector.assign(9900 * _ratio, 1);
-//    vector.resize(5000 * _ratio);
-//    vector.reserve(5000 * _ratio);
-//    v.push_back(vector.size());
-//    v.push_back(vector.capacity());
-//    vector.resize(7000 * _ratio);
-//    v.push_back(vector.size());
-//    v.push_back(vector.capacity());
-//    vector.resize(15300 * _ratio, T());
-//    v.push_back(vector.size());
-//    v.push_back(vector.capacity());
-//    v.push_back(vector[65]);
-//    print(&v);
-//    print(&vector);
-
-//    ft::vector<int> v;
-//    cout << "size v: " << v.size() << endl;
-//    cout << "size v: " << v.capacity() << endl;
-//    v.insert(v.begin(), 1);
-//    cout << "size v: " << v.size() << endl;
-//    cout << "size v: " << v.capacity() << endl;
-
-//    ft::vector<int>vector;
-//    ft::vector<int> v;
-//    vector.assign(2600 * 1000, 1);
-//    v.push_back(*(vector.insert(vector.end() - 800 * 1000, 44)));
-//    v.push_back(vector.size());
-//    v.push_back(vector.capacity());
-//    std::unique_ptr<B> k2(new B(3));
-//    std::unique_ptr<B> k3(new B(4));
-//    std::unique_ptr<B> k4(new B(-1));
-//    ft::vector<A> vv;
-//    ft::vector<B*> v1;
+    ft::map<int, string> f1;
+    ft::map<int, string> f2;
+    f1.insert(ft::pair<int, string>(1, "A"));
+    f1.insert(f1.begin(), ft::make_pair(2, "B"));
+    f1.insert(f2.end(), ft::make_pair(3, "C"));
+    f1.insert(ft::make_pair(4, "D"));
+    f1.insert(ft::make_pair(5, "E"));
+    f1.insert(ft::make_pair(6, "F"));
+    for (ft::map<int, string>::iterator it = f1.begin(), ite = f1.end(); it!=ite; ++it) {
+        cout << "key=" << it->first << " value=" << it->second << endl;
+//        it->first = 777;
+        it->second = "777";
+    }
+    for (ft::map<int, string>::const_iterator it = f1.begin(), ite = f1.end(); it!=ite; ++it) {
+        cout << "key=" << it->first << " value=" << it->second << endl;
+//        it->first = 777;
+//        it->second = "777";
+    }
+    for (ft::map<int, string>::reverse_iterator it = f1.rbegin(), ite = f1.rend(); it!=ite; ++it) {
+        cout << "key=" << it->first << " value=" << it->second << endl;
+//        it->first = 777;
+        it->second = "777";
+    }
+    for (ft::map<int, string>::const_reverse_iterator it = f1.rbegin(), ite = f1.rend(); it!=ite; ++it) {
+        cout << "key=" << it->first << " value=" << it->second << endl;
+//        it->first = 777;
+//        it->second = "777";
+    }
+//    cout << "size= " << f1.size() << endl << endl;
+//    cout << "lower_bound " << endl;
+//    cout << "std = " << m1.lower_bound(3)->second << endl;
+//    cout << "ft = " << f1.lower_bound(3)->second << endl;
 //
-//    v1.push_back(&(*k2));
-//    v1.push_back(&(*k3));
-//    v1.push_back(&(*k4));
-//    try { vv.insert(vv.begin(), v1.begin(), v1.end()); }
-//    catch (...) {
-//        cout << "CATCH A!"  << endl;
-
-//    	v.push_back(vv.size());
-//    	v.push_back(vv.capacity());
-//    }
-//    cout << "1 ft:: size: " << vector.size() << " capacity: " << vector.capacity() << endl;
-//    cout << "2 ft:: size: " << v.size() << " capacity: " << v.capacity() << endl;
-
-//    std::vector<int> v1(5,5);
-//    cout << "size: " << v1.size() << endl;
-//    cout << "capacity: " << v1.capacity() << endl;
-//    v1.resize(8);
-//    cout << "value[7] : " << v1.back() << endl;
-//    cout << "size: " << v1.size() << endl;
-//    cout << "capacity: " << v1.capacity() << endl;
-
-
-//    std::vector<int> v;
-//    v.reserve(0);
-//    v.resize(0);
-//    cout << "size: " << v.size() << endl;
-//    cout << "capacity: " << v.capacity() << endl;
-
+//    cout << "upper_bound " << endl;
+//    cout << "std = " << m1.upper_bound(3)->second << endl;
+//    cout << "ft = " << f1.upper_bound(3)->second << endl;
 //
-//    std::vector<int> v1;
-//    v1.push_back(1);
-//    v1.push_back(4);
-//    v1.push_back(5);
-////    v1.reserve(10);
-//    std::vector<int> v2;
-//    v2.push_back(2);
-//    v2.push_back(3);
-//
-//    cout << "size: " << v1.size() << endl;
-//    cout << "capacity: " << v1.capacity() << endl;
-//    for (int i = 0; i < v1.size(); ++i) {
-//        cout << "v[" << i << "] = " << v1[i] << endl;
-//    }
-//    cout << endl;
-//    v1.insert(v1.begin() + 1, v2.begin(), v2.end());
-//    for (int i = 0; i < v1.size(); ++i) {
-//        cout << "v[" << i << "] = " << v1[i] << endl;
-//    }
-//    cout << "size: " << v1.size() << endl;
-//    cout << "capacity: " << v1.capacity() << endl;
+//    cout << "std iterator category " << ((typeid(std::map<int, string>::iterator::iterator_category)) == (typeid(std::bidirectional_iterator_tag) )) << endl;
+//    cout << "ft iterator category " << ((typeid(ft::map<int, string>::iterator::iterator_category)) == (typeid(ft::bidirectional_iterator_tag) )) << endl;
+    std::map<int, string> s;
+    cout << "count " << s.count(0) << endl;
 
+//    ft::map<int, string> f;
+//    cout << "count " << f.count(0) << endl;
 
-//    try { ft::vector<int> tmp5(-1, -1); }
-//    catch (std::exception &e) {
-//        cout << e.what() << endl;
-//    }
-//    std::vector<int> std;
-//    int x = 10000000;
-//    time_t start;
-//    for (int i = 0; i < 9 * x; ++i)
-//        std.push_back(i);
-//    start = timer();
-//    std.erase(std.begin() + 10);
-//
-//    cout << "time: " << timer() - start << endl;
-//    cout << "size: " << std.size() << endl;
-//    cout << "capacity: " << std.capacity() << endl;
-//
-//    ft::vector<int> ft;
-//    for (int i = 0; i < 9 * x; ++i)
-//        ft.push_back(i);
-//    start = timer();
-//    ft.erase(ft.begin() + 10);
-//    cout << "time: " << timer() - start << endl;
-//    cout << "size: " << ft.size() << endl;
-//    cout << "capacity: " << ft.capacity() << endl;
+    ft::map<int, int> mp;
 
-//    int x = 10000;
-//    ft::vector<int> v1;
-//    ft::vector<int> v2;
-//    ft::vector<int> tmp0(v1);
-//    ft::vector<int> tmp(1000 * x, 4), tmp2(1000 * x, 5);
-//    tmp = tmp2;
-//    ft::vector<int> tmp3(tmp);
-//    time_t start = timer();
-//    ft::vector<int> tmp4(tmp.begin(), tmp.end());
-//    time_t end = timer();
-//    v1.push_back(tmp4.size());
-//    v1.push_back(tmp4.capacity());
-//    v1.push_back(tmp[2]);
-//    v1.push_back(tmp3[2]);
-//    v1.push_back(tmp4[2]);
-//    try { ft::vector<int> tmp5(-1, -1); }
-//    catch (std::exception &e) {
-//        v1.push_back(1);
-//    }
-
-    ft::map<int, string> map;
-
+    mp.insert(ft::make_pair(10, 10));
+    mp.insert(ft::make_pair(20, 20));
+    mp.insert(ft::make_pair(30, 30));
+    mp.insert(ft::make_pair(40, 40));
+    mp.insert(ft::make_pair(50, 50));
+    mp.insert(ft::make_pair(60, 60));
+    const ft::pair<ft::map<int, int>::const_iterator , ft::map<int, int>::const_iterator>& pair = mp.equal_range(10);
+    ft::map<int, int> map;
+    ft::map<int, int>::reverse_iterator rit = map.rbegin();
+//    rit->
+    std::map<int, int> std;
+    std::map<int, int>::reverse_iterator srit = std.rbegin();
     return 0;
 }
