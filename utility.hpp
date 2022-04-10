@@ -7,8 +7,12 @@
 namespace ft {
 	template <class T, class A>
 	class vector;
+
 	template <class Key, class T, class Compare, class A>
 	class map;
+
+    template <class Key, class Compare, class A>
+    class set;
 
 	template<class T, bool v>
 	struct integral_constant {
@@ -128,14 +132,19 @@ template< class InputIt1, class InputIt2, class BinaryPredicate >
 
 namespace std {
 	template <class T, class A>
-	void swap(ft::vector<T, A> &v1, ft::vector<T, A> &v2 ) {
+	void swap(ft::vector<T, A>& v1, ft::vector<T, A>& v2 ) {
 		v1.swap(v2);
 	}
 
 	template <class Key, class T, class Compare, class A>
-	void swap(ft::map<Key, T, Compare, A> &m1, ft::map<Key, T, Compare, A> &m2 ) {
+	void swap(ft::map<Key, T, Compare, A>& m1, ft::map<Key, T, Compare, A>& m2 ) {
 		m1.swap(m2);
 	}
+
+    template<class Key, class Compare, class A>
+    void swap(ft::set<Key, Compare, A>& s1, ft::set<Key, Compare, A>& s2) {
+        s1.swap(s2);
+    }
 }
 
 #endif

@@ -7,6 +7,8 @@ include_directories(.)
 
 add_executable(ft_containers
         map.hpp
+        set.hpp
+        set_iterator.hpp
         utility.hpp
         node.hpp
 #        stack.hpp
