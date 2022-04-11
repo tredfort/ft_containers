@@ -8,7 +8,7 @@ namespace ft {
 	class vector_iterator {
 	public:
         typedef Iterator iterator_type;
-        typedef typename ft::iterator_traits<iterator_type>::iterator_category iterator_category;
+        typedef typename ft::random_access_iterator_tag iterator_category;
         typedef typename ft::iterator_traits<iterator_type>::value_type value_type;
         typedef typename ft::iterator_traits<iterator_type>::difference_type difference_type;
         typedef typename ft::iterator_traits<iterator_type>::pointer pointer;

@@ -14,8 +14,7 @@ namespace ft {
         typedef typename ft::iterator_traits<iterator_type>::difference_type difference_type;
         typedef typename ft::iterator_traits<iterator_type>::pointer pointer;
         typedef typename ft::iterator_traits<iterator_type>::reference reference;
-//        typedef node<T1, T2>* nodePointer;
-        typedef node<ft::pair<const T1, T2> >* nodePointer;
+        typedef node<T1, T2>* nodePointer;
 
     private:
         nodePointer _ptr;

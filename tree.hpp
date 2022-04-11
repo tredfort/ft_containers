@@ -11,7 +11,7 @@ namespace ft {
         typedef T1 key_type;
         typedef T2 mapped_type;
         typedef Compare key_compare;
-		typedef typename Alloc::template rebind< node<ft::pair<T1, T2> > >::other allocator_type;
+        typedef typename Alloc::template rebind< node<T1, T2> >::other allocator_type;
         typedef typename allocator_type::value_type value_type;
         typedef typename allocator_type::reference reference;
         typedef typename allocator_type::const_reference const_reference;
@@ -32,7 +32,7 @@ namespace ft {
     public:
         tree() : _alloc(), _cmp(key_compare()), _head(_alloc.allocate(1)), _nil(_head), _size(0)
         {
-            _alloc.construct(_nil, value_type(ft::pair<T1, T2>(T1(), T2()), NULL, nilNode));
+            _alloc.construct(_nil, value_type(key_type(), mapped_type(), NULL, nilNode));
         }
 
         ~tree()
@@ -352,7 +352,7 @@ namespace ft {
 						  current->left : current->right;
 			}
 			x = _alloc.allocate(1);
-			_alloc.construct(x, value_type(ft::pair<T1, T2>(key, value), _nil, redNode));
+            _alloc.construct(x, value_type(key, value, _nil, redNode));
 			x->parent = parent;
 
 			/* insert node in tree */
