@@ -29,11 +29,13 @@ namespace ft {
 
 		void pop() { container.pop_back(); }
 
-		friend bool operator==(const stack<T, Container>& lhs, const stack<T, Container>& rhs) {
+		friend bool operator==(const stack<T, Container>& lhs, const stack<T, Container>& rhs)
+		{
             return lhs.container==rhs.container;
 		}
 
-		friend bool operator<(const stack<T, Container>& lhs, const stack<T, Container>& rhs) {
+		friend bool operator<(const stack<T, Container>& lhs, const stack<T, Container>& rhs)
+		{
 			return lhs.container<rhs.container;
 		}
 	};

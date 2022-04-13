@@ -97,7 +97,7 @@ namespace ft {
 
         mapped_type& operator[](const key_type& key)
         {
-            ft::pair<iterator, bool> res = insert(ft::pair<Key, mapped_type>(key, _tree.search(key)->data->second));
+            ft::pair<iterator, bool> res = insert(ft::pair<Key, mapped_type>(key, _tree.find(key)->data->second));
             return res.first->second;
         }
 
@@ -160,11 +160,11 @@ namespace ft {
             std::swap(_key_compare, other._key_compare);
         }
 
-        size_type count(const key_type& key) const { return (_tree.search(key) != _tree.end()) ? 1 : 0; }
+        size_type count(const key_type& key) const { return (_tree.find(key) != _tree.end()) ? 1 : 0; }
 
-		iterator find(const key_type& key) { return iterator(_tree.search(key)); }
+		iterator find(const key_type& key) { return iterator(_tree.find(key)); }
 
-        const_iterator find(const key_type& key) const { return const_iterator(_tree.search(key)); }
+        const_iterator find(const key_type& key) const { return const_iterator(_tree.find(key)); }
 
         ft::pair<const_iterator, const_iterator> equal_range(const key_type& key) const {
             return ft::pair<const_iterator, const_iterator>(lower_bound(key), upper_bound(key));

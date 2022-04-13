@@ -27,18 +27,21 @@ namespace ft {
 
         pointer base() const { return _ptr; }
 
-		vector_iterator& operator=(const vector_iterator& other) {
+		vector_iterator& operator=(const vector_iterator& other)
+		{
 			if (this != &other)
     			_ptr = other._ptr;
 			return *this;
 		}
 
-		vector_iterator& operator-=(difference_type n) {
+		vector_iterator& operator-=(difference_type n)
+		{
 			_ptr -= n;
 			return *this;
 		}
 
-		vector_iterator& operator+=(difference_type n) {
+		vector_iterator& operator+=(difference_type n)
+		{
 			_ptr += n;
 			return *this;
 		}
@@ -47,23 +50,27 @@ namespace ft {
 
 		vector_iterator operator+(difference_type n) const { return _ptr + n; }
 
-		vector_iterator& operator++() {
+		vector_iterator& operator++()
+		{
 			_ptr++;
 			return *this;
 		}
 
-		vector_iterator& operator--() {
+		vector_iterator& operator--()
+		{
 			_ptr--;
 			return *this;
 		}
 
-		vector_iterator operator++(int) {
+		vector_iterator operator++(int)
+		{
 			vector_iterator tmp(*this);
 			_ptr++;
 			return tmp;
 		}
 
-		vector_iterator operator--(int) {
+		vector_iterator operator--(int)
+		{
 			vector_iterator tmp(*this);
 			_ptr--;
 			return tmp;

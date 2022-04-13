@@ -55,7 +55,8 @@ namespace ft {
 
         ~set() { }
 
-        set& operator=(const set& other) {
+        set& operator=(const set& other)
+        {
             _tree = other._tree;
             _alloc = other._alloc;
             _key_compare = other._key_compare;
@@ -117,7 +118,8 @@ namespace ft {
 
         size_type erase(const key_type& key) { return _tree.erase(key) ? 1 : 0; }
 
-        void swap(set& other) {
+        void swap(set& other)
+        {
             _tree.swap(other._tree);
             std::swap(_alloc, other._alloc);
             std::swap(_key_compare, other._key_compare);
@@ -133,7 +135,8 @@ namespace ft {
             return ft::pair<const_iterator, const_iterator>(lower_bound(key), upper_bound(key));
         }
 
-        ft::pair<iterator, iterator> equal_range(const key_type& key) {
+        ft::pair<iterator, iterator> equal_range(const key_type& key)
+        {
             return ft::pair<iterator, iterator>(lower_bound(key), upper_bound(key));
         }
 
@@ -151,43 +154,43 @@ namespace ft {
 
         friend bool operator==(
                 const set<Key, Compare, Allocator>& lhs,
-                const set<Key, Compare, Allocator>& rhs
-        ) {
+                const set<Key, Compare, Allocator>& rhs)
+        {
             return lhs.size() == rhs.size() && ft::equal(lhs.begin(), lhs.end(), rhs.begin());
         }
 
         friend bool operator!=(
                 const set<Key, Compare, Allocator>& lhs,
-                const set<Key, Compare, Allocator>& rhs
-        ) {
+                const set<Key, Compare, Allocator>& rhs)
+        {
             return !(lhs==rhs);
         }
 
         friend bool operator<(
                 const set<Key, Compare, Allocator>& lhs,
-                const set<Key, Compare, Allocator>& rhs
-        ) {
+                const set<Key, Compare, Allocator>& rhs)
+        {
             return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
         }
 
         friend bool operator<=(
                 const set<Key, Compare, Allocator>& lhs,
-                const set<Key, Compare, Allocator>& rhs
-        ) {
+                const set<Key, Compare, Allocator>& rhs)
+        {
             return !(rhs<lhs);
         }
 
         friend bool operator>(
                 const set<Key, Compare, Allocator>& lhs,
-                const set<Key, Compare, Allocator>& rhs
-        ) {
+                const set<Key, Compare, Allocator>& rhs)
+        {
             return rhs<lhs;
         }
 
         friend bool operator>=(
                 const set<Key, Compare, Allocator>& lhs,
-                const set<Key, Compare, Allocator>& rhs
-        ) {
+                const set<Key, Compare, Allocator>& rhs)
+        {
             return !(lhs<rhs);
         }
     };

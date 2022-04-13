@@ -41,7 +41,8 @@ namespace ft {
 	template<class T> struct enable_if<true, T> { typedef T type; };
 
 template< class InputIt1, class InputIt2 >
-	bool equal( InputIt1 first1, InputIt1 last1, InputIt2 first2 ) {
+	bool equal( InputIt1 first1, InputIt1 last1, InputIt2 first2 )
+	{
 		for (; first1 != last1; ++first1, ++first2) {
 			if (*first1 != *first2) {
 				return false;
@@ -52,7 +53,8 @@ template< class InputIt1, class InputIt2 >
 
 template< class InputIt1, class InputIt2, class BinaryPredicate >
 	bool equal( InputIt1 first1, InputIt1 last1,
-				InputIt2 first2, BinaryPredicate p ) {
+				InputIt2 first2, BinaryPredicate p)
+	{
 		for (; first1 != last1; ++first1, ++first2) {
 			if (!p(*first1, *first2)) {
 				return false;
@@ -62,7 +64,8 @@ template< class InputIt1, class InputIt2, class BinaryPredicate >
 	}
 
 	template<class InputIt1, class InputIt2>
-	bool lexicographical_compare(InputIt1 first1, InputIt1 last1, InputIt2 first2, InputIt2 last2) {
+	bool lexicographical_compare(InputIt1 first1, InputIt1 last1, InputIt2 first2, InputIt2 last2)
+	{
 		for ( ; (first1 != last1) && (first2 != last2); ++first1, (void) ++first2 ) {
 			if (*first1 < *first2) return true;
 			if (*first2 < *first1) return false;
@@ -88,63 +91,53 @@ template< class InputIt1, class InputIt2, class BinaryPredicate >
 			return *this;
 		}
 
-		void swap(pair& p) {
+		void swap(pair& p)
+		{
 			std::swap(first,  p.first);
 			std::swap(second, p.second);
 		}
 	};
 
 	template <class T1, class T2>
-	inline bool operator==(const pair<T1, T2>& x, const pair<T1, T2>& y) {
+	inline bool operator==(const pair<T1, T2>& x, const pair<T1, T2>& y)
+	{
 		return x.first == y.first && x.second == y.second;
 	}
 
 	template <class T1, class T2>
-	inline bool operator!=(const pair<T1, T2>& x, const pair<T1, T2>& y) {
+	inline bool operator!=(const pair<T1, T2>& x, const pair<T1, T2>& y)
+	{
 		return !(x == y);
 	}
 
 	template <class T1, class T2>
-	inline bool operator< (const pair<T1, T2>& x, const pair<T1, T2>& y) {
+	inline bool operator< (const pair<T1, T2>& x, const pair<T1, T2>& y)
+	{
 		return x.first < y.first || (!(y.first < x.first) && x.second < y.second);
 	}
 
 	template <class T1, class T2>
-	inline bool operator> (const pair<T1, T2>& x, const pair<T1, T2>& y) {
-		return y < x;
-	}
+	inline bool operator> (const pair<T1, T2>& x, const pair<T1, T2>& y) { return y < x; }
 
 	template <class T1, class T2>
-	inline bool operator>=(const pair<T1, T2>& x, const pair<T1, T2>& y) {
-		return !(x < y);
-	}
+	inline bool operator>=(const pair<T1, T2>& x, const pair<T1, T2>& y) { return !(x < y); }
 
 	template <class T1, class T2>
-	inline bool operator<=(const pair<T1, T2>& x, const pair<T1, T2>& y) {
-		return !(y < x);
-	}
+	inline bool operator<=(const pair<T1, T2>& x, const pair<T1, T2>& y) { return !(y < x); }
 
 	template <class T1, class T2>
-	inline pair<T1, T2> make_pair(T1 x, T2 y) {
-		return pair<T1, T2>(x, y);
-	}
+	inline pair<T1, T2> make_pair(T1 x, T2 y) { return pair<T1, T2>(x, y); }
 }
 
 namespace std {
 	template <class T, class A>
-	void swap(ft::vector<T, A>& v1, ft::vector<T, A>& v2 ) {
-		v1.swap(v2);
-	}
+	void swap(ft::vector<T, A>& v1, ft::vector<T, A>& v2 ) { v1.swap(v2); }
 
 	template <class Key, class T, class Compare, class A>
-	void swap(ft::map<Key, T, Compare, A>& m1, ft::map<Key, T, Compare, A>& m2 ) {
-		m1.swap(m2);
-	}
+	void swap(ft::map<Key, T, Compare, A>& m1, ft::map<Key, T, Compare, A>& m2 ) { m1.swap(m2); }
 
     template<class Key, class Compare, class A>
-    void swap(ft::set<Key, Compare, A>& s1, ft::set<Key, Compare, A>& s2) {
-        s1.swap(s2);
-    }
+    void swap(ft::set<Key, Compare, A>& s1, ft::set<Key, Compare, A>& s2) { s1.swap(s2); }
 }
 
 #endif
