@@ -2,6 +2,7 @@
 #define SET_HPP
 
 #include "tree.hpp"
+#include "set_iterator.hpp"
 #include "reverse_iterator.hpp"
 
 namespace ft {
@@ -10,8 +11,6 @@ namespace ft {
             class Allocator = std::allocator<Key>
     >
     class set {
-    private:
-        typedef tree<const Key, Key, Compare, Allocator> tree_type;
     public:
         typedef Key key_type;
         typedef key_type value_type;
@@ -24,33 +23,37 @@ namespace ft {
         typedef typename allocator_type::difference_type difference_type;
         typedef typename allocator_type::pointer pointer;
         typedef typename allocator_type::const_pointer const_pointer;
-        typedef typename tree_type::iterator iterator;
-        typedef typename tree_type::const_iterator const_iterator;
+        typedef ft::set_iterator<Key, const value_type*> iterator;
+        typedef ft::set_iterator<Key, const value_type*> const_iterator;
         typedef ft::reverse_iterator<iterator> reverse_iterator;
         typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
 
     private:
-        tree_type _tree;
+        tree<Key, bool, Compare, Allocator> _tree;
         key_compare _key_compare;
         allocator_type _alloc;
+
     public:
 
         set() :_tree(), _key_compare(key_compare()), _alloc(allocator_type()) { }
 
-        explicit set(
+        set(
                 const Compare& comp,
                 const Allocator& alloc = allocator_type()
                         ) :_tree(), _key_compare(comp), _alloc(alloc) { }
 
         template< class InputIt >
-        set(InputIt first, InputIt last,
-            const Compare& comp = Compare(),
-            const Allocator& alloc = allocator_type()
-                    )
-                    :_tree(), _key_compare(comp), _alloc(alloc) { insert(first, last); }
+        set(
+                InputIt first,
+                InputIt last,
+                const Compare& comp = Compare(),
+                const Allocator& alloc = allocator_type()
+                    ) :_tree(), _key_compare(comp), _alloc(alloc) { insert(first, last); }
 
         set(const set& other) { *this = other; }
 
+
+        ~set() { }
 
         set& operator=(const set& other) {
             _tree = other._tree;
@@ -59,7 +62,7 @@ namespace ft {
             return *this;
         }
 
-        ~set() { }
+        allocator_type get_allocator() const { return _alloc; }
 
         iterator begin() { return iterator(_tree.begin()); }
 
@@ -85,28 +88,28 @@ namespace ft {
 
         void clear() { _tree.clear(); }
 
-        ft::pair<iterator, bool> insert(const value_type& val) { return _tree.insert(val); }
+        ft::pair<iterator, bool> insert(const value_type& value) { return _tree.insert(ft::pair<const value_type, bool>(value, true)); }
 
-        iterator insert(iterator hint, const value_type& val)
+        iterator insert(iterator hint, const value_type& value)
         {
             (void) hint;
-            return _tree.insert(val).first;
+            return _tree.insert(ft::pair<value_type, bool>(value, true)).first;
         }
 
         template<class InputIterator>
         void insert(InputIterator first, InputIterator last)
         {
             for (; first!=last; ++first) {
-                _tree.insert(first);
+                _tree.insert(ft::pair<value_type, bool>(*first, true));
             }
         }
 
-        void erase(iterator pos) { _tree.erase(pos->first); }
+        void erase(iterator pos) { _tree.erase(*pos); }
 
         void erase(iterator first, iterator last)
         {
             while (first!=last) {
-                Key key = first->first;
+                Key key = *first;
                 ++first;
                 _tree.erase(key);
             }
@@ -115,7 +118,7 @@ namespace ft {
         size_type erase(const key_type& key) { return _tree.erase(key) ? 1 : 0; }
 
         void swap(set& other) {
-            std::swap(_tree, other._tree);
+            _tree.swap(other._tree);
             std::swap(_alloc, other._alloc);
             std::swap(_key_compare, other._key_compare);
         }
@@ -149,48 +152,44 @@ namespace ft {
         friend bool operator==(
                 const set<Key, Compare, Allocator>& lhs,
                 const set<Key, Compare, Allocator>& rhs
-                )
-        {
-            if (lhs.size()!=rhs.size())
-                return false;
-            return ft::equal(lhs.begin(), lhs.end(), rhs.begin());
+        ) {
+            return lhs.size() == rhs.size() && ft::equal(lhs.begin(), lhs.end(), rhs.begin());
         }
 
         friend bool operator!=(
                 const set<Key, Compare, Allocator>& lhs,
                 const set<Key, Compare, Allocator>& rhs
-                )
-                { return !(lhs==rhs); }
+        ) {
+            return !(lhs==rhs);
+        }
 
         friend bool operator<(
                 const set<Key, Compare, Allocator>& lhs,
                 const set<Key, Compare, Allocator>& rhs
-                )
-        {
-            const_iterator lb = lhs.begin();
-            const_iterator le = lhs.end();
-            const_iterator rb = rhs.begin();
-            const_iterator re = rhs.end();
-            return ft::lexicographical_compare(lb, le, rb, re);
+        ) {
+            return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
         }
 
         friend bool operator<=(
                 const set<Key, Compare, Allocator>& lhs,
                 const set<Key, Compare, Allocator>& rhs
-        )
-        { return !(rhs<lhs); }
+        ) {
+            return !(rhs<lhs);
+        }
 
         friend bool operator>(
                 const set<Key, Compare, Allocator>& lhs,
                 const set<Key, Compare, Allocator>& rhs
-        )
-        { return rhs<lhs; }
+        ) {
+            return rhs<lhs;
+        }
 
         friend bool operator>=(
                 const set<Key, Compare, Allocator>& lhs,
                 const set<Key, Compare, Allocator>& rhs
-        )
-        { return !(lhs<rhs); }
+        ) {
+            return !(lhs<rhs);
+        }
     };
 }
 

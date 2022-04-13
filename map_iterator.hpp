@@ -1,12 +1,12 @@
-#ifndef TREE_ITERATOR_HPP
-#define TREE_ITERATOR_HPP
+#ifndef MAP_ITERATOR_HPP
+#define MAP_ITERATOR_HPP
 
 #include "node.hpp"
 #include "iterator_traits.hpp"
 
 namespace ft {
     template <class T1, class T2, class Iter>
-    class tree_iterator {
+    class map_iterator {
     public:
         typedef Iter iterator_type;
         typedef ft::bidirectional_iterator_tag iterator_category;
@@ -14,57 +14,57 @@ namespace ft {
         typedef typename ft::iterator_traits<iterator_type>::difference_type difference_type;
         typedef typename ft::iterator_traits<iterator_type>::pointer pointer;
         typedef typename ft::iterator_traits<iterator_type>::reference reference;
-        typedef node<T1, T2>* nodePointer;
 
     private:
+        typedef node<T1, T2>* nodePointer;
         nodePointer _ptr;
 
     public:
-        tree_iterator(nodePointer ptr = 0) :_ptr(ptr) { }
+        map_iterator(nodePointer ptr = 0) : _ptr(ptr) { }
 
         template<class U>
-        tree_iterator(const tree_iterator<T1, T2, U>& other) :_ptr(other.base()) { }
+        map_iterator(const map_iterator<T1, T2, U>& other) :_ptr(other.base()) { }
 
-        tree_iterator& operator=(const tree_iterator& other)
+        map_iterator& operator=(const map_iterator& other)
         {
             _ptr = other._ptr;
             return *this;
         }
 
-        ~tree_iterator() { }
+        ~map_iterator() { }
 
         nodePointer base() const { return _ptr; }
 
-        bool operator==(const tree_iterator& other) const { return _ptr == other._ptr; }
+        bool operator==(const map_iterator& other) const { return _ptr == other.base(); }
 
-        bool operator!=(const tree_iterator& other) const { return _ptr != other._ptr; }
+        bool operator!=(const map_iterator& other) const { return _ptr != other.base(); }
 
         reference operator*() const { return *(_ptr->data); }
 
         pointer operator->() const { return _ptr->data; }
 
-        tree_iterator& operator++()
+        map_iterator& operator++()
         {
             _ptr = next(_ptr);
             return *this;
         }
 
-        tree_iterator operator++(int)
+        map_iterator operator++(int)
         {
-            tree_iterator tmp(*this);
+            map_iterator tmp(*this);
             _ptr = next(_ptr);
             return tmp;
         }
 
-        tree_iterator& operator--()
+        map_iterator& operator--()
         {
             _ptr = prev(_ptr);
             return *this;
         }
 
-        tree_iterator operator--(int)
+        map_iterator operator--(int)
         {
-            tree_iterator tmp(*this);
+            map_iterator tmp(*this);
             _ptr = prev(_ptr);
             return tmp;
         }
@@ -120,4 +120,5 @@ namespace ft {
         }
     };
 }
+
 #endif

@@ -2,6 +2,7 @@
 #define MAP_HPP
 
 #include "tree.hpp"
+#include "map_iterator.hpp"
 #include "reverse_iterator.hpp"
 
 namespace ft {
@@ -11,8 +12,6 @@ namespace ft {
 			class Allocator = std::allocator<ft::pair<const Key, T> >
 	>
 	class map {
-    private:
-        typedef tree<const Key, T, Compare, Allocator> tree_type;
 	public:
 		typedef Key key_type;
 		typedef T mapped_type;
@@ -25,8 +24,8 @@ namespace ft {
         typedef typename allocator_type::const_pointer const_pointer;
         typedef typename allocator_type::size_type size_type;
         typedef typename allocator_type::difference_type difference_type;
-        typedef typename tree_type::iterator iterator;
-        typedef typename tree_type::const_iterator const_iterator;
+        typedef ft::map_iterator<Key, T, value_type*> iterator;
+        typedef ft::map_iterator<Key, T, const value_type*> const_iterator;
         typedef ft::reverse_iterator<iterator> reverse_iterator;
         typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
 
@@ -44,12 +43,12 @@ namespace ft {
         };
 
 	private:
-        tree_type _tree;
+        tree<Key, T, Compare, Allocator> _tree;
 		key_compare _key_compare;
 		allocator_type _alloc;
 
 	public:
-		explicit map(
+        explicit map(
 				const Compare& comp = key_compare(),
 				const Allocator& alloc = allocator_type()
                         )
@@ -66,7 +65,7 @@ namespace ft {
 
 		map(const map& other) { *this = other; }
 
-		~map() { }
+        ~map() { }
 
 		map& operator=(const map& other)
 		{
@@ -138,7 +137,7 @@ namespace ft {
 		void insert(InputIterator first, InputIterator last)
 		{
             for (; first!=last; ++first) {
-                _tree.insert(first);
+                _tree.insert(value_type(first->first, first->second));
             }
 		}
 
@@ -161,7 +160,7 @@ namespace ft {
             std::swap(_key_compare, other._key_compare);
         }
 
-        size_type count(const key_type& key) const { return (const_iterator(_tree.search(key)) != end()) ? 1 : 0; }
+        size_type count(const key_type& key) const { return (_tree.search(key) != _tree.end()) ? 1 : 0; }
 
 		iterator find(const key_type& key) { return iterator(_tree.search(key)); }
 
@@ -190,48 +189,44 @@ namespace ft {
 		friend bool operator==(
                 const map<Key, T, Compare, Allocator>& lhs,
 				const map<Key, T, Compare, Allocator>& rhs
-                )
-		{
-			if (lhs.size()!=rhs.size())
-				return false;
-			return ft::equal(lhs.begin(), lhs.end(), rhs.begin());
-		}
+                ) {
+            return lhs.size() == rhs.size() && ft::equal(lhs.begin(), lhs.end(), rhs.begin());
+        }
 
 		friend bool operator!=(
                 const map<Key, T, Compare, Allocator>& lhs,
 				const map<Key, T, Compare, Allocator>& rhs
-                )
-                { return !(lhs==rhs); }
+                ) {
+            return !(lhs==rhs);
+        }
 
 		friend bool operator<(
                 const map<Key, T, Compare, Allocator>& lhs,
 				const map<Key, T, Compare, Allocator>& rhs
-                )
-		{
-			const_iterator lb = lhs.begin();
-			const_iterator le = lhs.end();
-			const_iterator rb = rhs.begin();
-			const_iterator re = rhs.end();
-			return ft::lexicographical_compare(lb, le, rb, re);
+                ) {
+			return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
 		}
 
 		friend bool operator<=(
                 const map<Key, T, Compare, Allocator>& lhs,
 				const map<Key, T, Compare, Allocator>& rhs
-                )
-                { return !(rhs<lhs); }
+                ) {
+            return !(rhs<lhs);
+        }
 
 		friend bool operator>(
                 const map<Key, T, Compare, Allocator>& lhs,
 				const map<Key, T, Compare, Allocator>& rhs
-                )
-                { return rhs<lhs; }
+                ) {
+            return rhs<lhs;
+        }
 
 		friend bool operator>=(
                 const map<Key, T, Compare, Allocator>& lhs,
 				const map<Key, T, Compare, Allocator>& rhs
-                )
-                { return !(lhs<rhs); }
+                ) {
+            return !(lhs<rhs);
+        }
 	};
 }
 

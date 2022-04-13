@@ -2,10 +2,9 @@
 #define TREE_HPP
 
 #include "node.hpp"
-#include "tree_iterator.hpp"
 
 namespace ft {
-	template< class T1, class T2, class Compare, class Alloc >
+	template<class T1, class T2, class Compare, class Alloc>
 	class tree {
 	public:
         typedef T1 key_type;
@@ -19,8 +18,6 @@ namespace ft {
         typedef typename allocator_type::const_pointer const_pointer;
         typedef typename allocator_type::size_type size_type;
         typedef typename allocator_type::difference_type difference_type;
-		typedef ft::tree_iterator<T1, T2, ft::pair<T1, T2>* > iterator;
-		typedef ft::tree_iterator<T1, T2, const ft::pair<T1, T2>* > const_iterator;
 
     private:
 		allocator_type _alloc;
@@ -46,26 +43,26 @@ namespace ft {
             if (this != &other) {
                 clear();
                 _cmp = other._cmp;
-                for (const_iterator it = other.begin(), ite = other.end(); it!=ite; ++it) {
-                    insert(it);
+                for (pointer ptr = other.begin(); ptr != other.end(); ptr = next(ptr)) {
+                    _add(ptr->data->first, ptr->data->second);
                 }
             }
             return *this;
         }
 
-        iterator begin() { return iterator(minimum(_head)); }
+        pointer begin() { return minimum(_head); }
 
-        const_iterator begin() const { return const_iterator(minimum(_head)); }
+        pointer begin() const { return minimum(_head); }
 
-        iterator end() { return iterator(_nil); }
+        pointer end() { return (_nil); }
 
-        const_iterator end() const { return const_iterator(_nil); }
+        pointer end() const { return (_nil); }
 
         void clear() { _removeTheWholeThree(_head); }
 
         pointer maximum(pointer node) const
         {
-            while (node != _nil && node->right != _nil) {
+            while (node->type != nilNode && node->right->type != nilNode) {
                 node = node->right;
             }
             return node;
@@ -73,27 +70,48 @@ namespace ft {
 
         pointer minimum(pointer node) const
         {
-            while (node != _nil && node->left != _nil) {
+            while (node->type != nilNode && node->left->type != nilNode) {
                 node = node->left;
             }
             return node;
         }
 
+        pointer next(pointer node)
+        {
+            if (node->type == nilNode)
+                return node;
+
+            if (node->right->type != nilNode)
+                return minimum(node->right);
+
+            pointer ptr = node->parent;
+            while (ptr->type != nilNode && node == ptr->right) {
+                node = ptr;
+                ptr = ptr->parent;
+            }
+            return ptr;
+        }
+
+        pointer prev(pointer node)
+        {
+            if (node->type == nilNode)
+                return node->parent;
+
+            if (node->type != nilNode && node->left->type != nilNode)
+                return maximum(node->left);
+
+            pointer ptr = node->parent;
+            while (ptr->type != nilNode && node == ptr->left) {
+                node = ptr;
+                ptr = ptr->parent;
+            }
+
+            return ptr->type != nilNode ? ptr : node;
+        }
+
         ft::pair<pointer, bool> insert(ft::pair<key_type, mapped_type> pair)
         {
             return _add(pair.first, pair.second);
-        }
-
-        ft::pair<pointer, bool> insert(pointer hint, ft::pair<key_type, mapped_type> pair)
-        {
-            (void) hint;
-            return _add(pair.first, pair.second);
-        }
-
-        template< class InputIterator >
-        ft::pair<pointer, bool> insert(InputIterator it)
-        {
-            return _add(it->first, it->second);
         }
 
         pointer search(key_type key) const

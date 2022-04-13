@@ -9,8 +9,8 @@ add_executable(ft_containers
         map.hpp
         set.hpp
         set_iterator.hpp
-        utility.hpp
-        node.hpp
+#        utility.hpp
+#        node.hpp
 #        stack.hpp
 #        vector.hpp
 #        vector_test/assign.cpp
@@ -43,5 +43,6 @@ add_executable(ft_containers
 #        vector_test/pop_back.cpp
 #        vector_test/reserve.cpp
 #        vector_test/swap.cpp
-        IterMain.cpp
+#        IterMain.cpp
+        treeMain.cpp
         )

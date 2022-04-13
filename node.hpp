@@ -5,7 +5,7 @@
 
 namespace ft {
 
-	enum NodeType {
+	enum nodeType {
 		nilNode,
 		blackNode,
 		redNode
@@ -14,13 +14,13 @@ namespace ft {
 	template<class T1, class T2>
 	struct node {
 		typedef ft::pair<const T1, T2> value_type;
-		NodeType type;
+		nodeType type;
 		node* parent;
 		node* left;
 		node* right;
 		value_type* data;
 
-        node(T1 key, T2 value, node* nil = NULL, NodeType type = blackNode)
+        node(T1 key, T2 value, node* nil = NULL, nodeType type = blackNode)
                 : type(type), parent(nil), left(nil), right(nil), data(new value_type(key, value)) { }
 
 		node(const node& other) { *this = other; }
