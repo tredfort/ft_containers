@@ -125,11 +125,11 @@ namespace ft {
             std::swap(_key_compare, other._key_compare);
         }
 
-        size_type count(const key_type& key) const { return (const_iterator(_tree.search(key)) != end()) ? 1 : 0; }
+        size_type count(const key_type& key) const { return (const_iterator(_tree.find(key)) != end()) ? 1 : 0; }
 
-        iterator find(const key_type& key) { return iterator(_tree.search(key)); }
+        iterator find(const key_type& key) { return iterator(_tree.find(key)); }
 
-        const_iterator find(const key_type& key) const { return const_iterator(_tree.search(key)); }
+        const_iterator find(const key_type& key) const { return const_iterator(_tree.find(key)); }
 
         ft::pair<const_iterator, const_iterator> equal_range(const key_type& key) const {
             return ft::pair<const_iterator, const_iterator>(lower_bound(key), upper_bound(key));
