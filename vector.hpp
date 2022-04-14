@@ -143,12 +143,14 @@ namespace ft {
                 typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type last)
         {
             clear();
+            reserve(last - first);
             insert(begin(), first, last);
         }
 
         void assign(size_type n, const value_type& value)
         {
             clear();
+            reserve(n);
             insert(begin(), n, value);
         }
 
