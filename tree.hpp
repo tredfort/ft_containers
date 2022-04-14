@@ -29,7 +29,7 @@ namespace ft {
     public:
         tree() : _alloc(), _cmp(key_compare()), _head(_alloc.allocate(1)), _nil(_head), _size(0)
         {
-            _alloc.construct(_nil, value_type(key_type(), mapped_type(), NULL, nilNode));
+            _alloc.construct(_nil, value_type(key_type(), mapped_type(), NULL, nil_node));
         }
 
         ~tree()
@@ -64,14 +64,41 @@ namespace ft {
 
         void clear() { clear(_head); }
 
-		ft::pair<pointer, bool> insert(ft::pair<key_type, mapped_type> pair) { return _add(pair.first, pair.second); }
+		ft::pair<pointer, bool> insert(ft::pair<key_type, mapped_type> pair)
+        {
+            pointer current, parent, new_node;
+
+            for (current = _head, parent = _nil; current != _nil;) {
+                if (pair.first == current->data->first)
+                    return ft::pair<pointer, bool>(current, false);
+                parent = current;
+                current = _cmp(pair.first, current->data->first) ? current->left : current->right;
+            }
+            new_node = _alloc.allocate(1);
+            _alloc.construct(new_node, value_type(pair.first, pair.second, _nil, red_node));
+            new_node->parent = parent;
+
+            if (parent == _nil)
+                _head = new_node;
+            else {
+                if (_cmp(pair.first, parent->data->first))
+                    parent->left = new_node;
+                else
+                    parent->right = new_node;
+            }
+
+            insert_fixup(new_node);
+            _nil->parent = maximum(_head);
+            ++_size;
+            return ft::pair<pointer, bool>(new_node, true);
+        }
 
 		bool erase(key_type key)
 		{
         	pointer node = find(_head, key);
         	if (node == _nil)
         		return false;
-			delete_node(node);
+            erase_node(node);
         	--_size;
         	return true;
 		}
@@ -91,18 +118,17 @@ namespace ft {
 		{
 			if (_head != _nil)
 			{
-				pointer node = _head;
-				pointer remembered = node;
-				while (node != _nil) {
-					if (key == node->data->first)
-						return node;
-					if (_cmp(key, node->data->first)) {
-						remembered = node;
-						node = node->left;
-					}
-					else
-						node = node->right;
-				}
+                pointer node, remembered;
+                for (node = _head, remembered = _head; node != _nil;) {
+                    if (key == node->data->first)
+                        return node;
+                    if (_cmp(key, node->data->first)) {
+                        remembered = node;
+                        node = node->left;
+                    }
+                    else
+                        node = node->right;
+                }
 				return _cmp(key, remembered->data->first) ? remembered : _nil;
 			}
 			return _nil;
@@ -112,17 +138,15 @@ namespace ft {
 		{
 			if (_head != _nil)
 			{
-				pointer node = _head;
-				pointer remembered = node;
-				while (node != _nil) {
-
-					if (_cmp(key, node->data->first)) {
-						remembered = node;
-						node = node->left;
-					}
-					else
-						node = node->right;
-				}
+                pointer node, remembered;
+                for (node = _head, remembered = _head; node != _nil;) {
+                    if (_cmp(key, node->data->first)) {
+                        remembered = node;
+                        node = node->left;
+                    }
+                    else
+                        node = node->right;
+                }
 				return _cmp(key, remembered->data->first) ? remembered : _nil;
 			}
 			return _nil;
@@ -144,51 +168,40 @@ namespace ft {
 
 		pointer maximum(pointer node) const
 		{
-			while (node->type != nilNode && node->right->type != nilNode) {
-				node = node->right;
-			}
+            for (; node->type != nil_node && node->right->type != nil_node; node = node->right) { }
 			return node;
 		}
 
 		pointer minimum(pointer node) const
 		{
-			while (node->type != nilNode && node->left->type != nilNode) {
-				node = node->left;
-			}
+            for (; node->type != nil_node && node->left->type != nil_node; node = node->left) { }
 			return node;
 		}
 
 		pointer next(pointer node)
 		{
-			if (node->type == nilNode)
+			if (node->type == nil_node)
 				return node;
 
-			if (node->right->type != nilNode)
+			if (node->right->type != nil_node)
 				return minimum(node->right);
 
 			pointer tmp = node->parent;
-			while (tmp->type != nilNode && node == tmp->right) {
-				node = tmp;
-				tmp = tmp->parent;
-			}
-			return tmp;
+            for (; tmp->type != nil_node && node == tmp->right; node = tmp, tmp = tmp->parent) { }
+            return tmp;
 		}
 
 		pointer prev(pointer node)
 		{
-			if (node->type == nilNode)
+			if (node->type == nil_node)
 				return node->parent;
 
-			if (node->type != nilNode && node->left->type != nilNode)
+			if (node->type != nil_node && node->left->type != nil_node)
 				return maximum(node->left);
 
 			pointer tmp = node->parent;
-			while (tmp->type != nilNode && node == tmp->left) {
-				node = tmp;
-				tmp = tmp->parent;
-			}
-
-			return tmp->type != nilNode ? tmp : node;
+            for (; tmp->type != nil_node && node == tmp->left; node = tmp, tmp = tmp->parent) { }
+            return tmp->type != nil_node ? tmp : node;
 		}
 
 		void free_node(const pointer& node)
@@ -214,282 +227,189 @@ namespace ft {
                 free_node(node);
 		}
 
+        void erase_node(pointer z)
+        {
+            pointer x, y;
+
+            if (z != _nil) {
+                if (z->left == _nil || z->right == _nil)
+                    y = z;
+                else {
+                    y = z->right;
+                    for (; y->left != _nil; y = y->left) { }
+                }
+
+                if (y->left != _nil)
+                    x = y->left;
+                else
+                    x = y->right;
+
+                if (x != _nil)
+                    x->parent = y->parent;
+                if (y->parent == _nil)
+                    _head = x;
+                else {
+                    if (y == y->parent->left)
+                        y->parent->left = x;
+                    else
+                    y->parent->right = x;
+                }
+
+                if (y != z) {
+                    delete z->data;
+                    z->data = new ft::pair<const key_type, mapped_type>(y->data->first, y->data->second);
+                }
+
+                if (y->type == black_node)
+                    delete_fixup(x);
+
+                _alloc.destroy(y);
+                _alloc.deallocate(y, 1);
+                _nil->parent = maximum(_head);
+            }
+        }
+
 		void insert_fixup(pointer x)
 		{
-
-			/*************************************
-			 *  maintain Red-Black tree balance  *
-			 *  after inserting node x           *
-			 *************************************/
-
-			/* check Red-Black properties */
-			while (x != _head && x->parent->type == redNode) {
-				/* we have a violation */
-				if (x->parent==x->parent->parent->left) {
+            for (; x != _head && x->parent->type == red_node;) {
+				if (x->parent == x->parent->parent->left) {
 					pointer y = x->parent->parent->right;
-					if (y->type == redNode) {
-
-						/* uncle is redNode */
-						x->parent->type = blackNode;
-						y->type = blackNode;
-						x->parent->parent->type = redNode;
+					if (y->type == red_node) {
+						x->parent->type = black_node;
+						y->type = black_node;
+						x->parent->parent->type = red_node;
 						x = x->parent->parent;
-					}
-					else {
-
-						/* uncle is blackNode */
-						if (x==x->parent->right) {
-							/* make x a left child */
+					} else {
+						if (x == x->parent->right) {
 							x = x->parent;
 							rotate_left(x);
 						}
-
-						/* recolor and rotate */
-						x->parent->type = blackNode;
-						x->parent->parent->type = redNode;
+						x->parent->type = black_node;
+						x->parent->parent->type = red_node;
 						rotate_right(x->parent->parent);
 					}
-				}
-				else {
-
-					/* mirror image of above code */
+				} else {
 					pointer y = x->parent->parent->left;
-					if (y->type == redNode) {
-
-						/* uncle is redNode */
-						x->parent->type = blackNode;
-						y->type = blackNode;
-						x->parent->parent->type = redNode;
+					if (y->type == red_node) {
+						x->parent->type = black_node;
+						y->type = black_node;
+						x->parent->parent->type = red_node;
 						x = x->parent->parent;
-					}
-					else {
-
-						/* uncle is blackNode */
-						if (x==x->parent->left) {
+					} else {
+						if (x == x->parent->left) {
 							x = x->parent;
 							rotate_right(x);
 						}
-						x->parent->type = blackNode;
-						x->parent->parent->type = redNode;
+						x->parent->type = black_node;
+						x->parent->parent->type = red_node;
 						rotate_left(x->parent->parent);
 					}
 				}
 			}
-            _head->type = blackNode;
-		}
-
-		ft::pair<pointer, bool> _add(key_type key, mapped_type value)
-		{
-			pointer current, parent, x;
-
-			/***********************************************
-			 *  allocate node for data and insert in tree  *
-			 ***********************************************/
-
-			/* find where node belongs */
-			current = _head;
-			parent = _nil;
-			while (current != _nil) {
-				if (key==current->data->first) return ft::pair<pointer, bool>(current, false);
-				parent = current;
-				current = _cmp(key, current->data->first) ?
-						  current->left : current->right;
-			}
-			x = _alloc.allocate(1);
-            _alloc.construct(x, value_type(key, value, _nil, redNode));
-			x->parent = parent;
-
-			/* insert node in tree */
-			if (parent != _nil) {
-				if (_cmp(key, parent->data->first))
-					parent->left = x;
-				else
-					parent->right = x;
-			}
-			else {
-                _head = x;
-			}
-
-			insert_fixup(x);
-            _nil->parent = maximum(_head);
-			++_size;
-			return ft::pair<pointer, bool>(x, true);
-		}
-
-		void delete_node(pointer z)
-		{
-        	pointer x, y;
-
-        	/*****************************
-			 *  delete node z from tree  *
-			 *****************************/
-
-        	if (z == _nil) return;
-
-        	if (z->left == _nil || z->right == _nil) {
-        		/* y has a NIL node as a child */
-        		y = z;
-        	}
-        	else {
-        		/* find tree next with a NIL node as a child */
-        		y = z->right;
-        		while (y->left != _nil) y = y->left;
-        	}
-
-        	/* x is y's only child */
-        	if (y->left != _nil)
-        		x = y->left;
-        	else
-        		x = y->right;
-
-        	/* erase y from the parent chain */
-        	if (x != _nil)
-        		x->parent = y->parent;
-        	if (y->parent != _nil)
-        		if (y==y->parent->left)
-        			y->parent->left = x;
-        		else
-        			y->parent->right = x;
-        		else
-        			_head = x;
-
-        		if (y!=z) {
-        			delete z->data;
-        			z->data = new ft::pair<const key_type, mapped_type>(y->data->first, y->data->second);
-        		}
-
-        		if (y->type == blackNode)
-					delete_fixup(x);
-
-        		_alloc.destroy(y);
-        		_alloc.deallocate(y, 1);
-        		_nil->parent = maximum(_head);
+            _head->type = black_node;
 		}
 
 		void delete_fixup(pointer x)
 		{
-
-			/*************************************
-			 *  maintain Red-Black tree balance  *
-			 *  after deleting node x            *
-			 *************************************/
-
-			while (x != _head && x->type == blackNode) {
-				if (x==x->parent->left) {
+            for (; x != _head && x->type == black_node;) {
+				if (x == x->parent->left) {
 					pointer w = x->parent->right;
-					if (w->type == redNode) {
-						w->type = blackNode;
-						x->parent->type = redNode;
+					if (w->type == red_node) {
+						w->type = black_node;
+						x->parent->type = red_node;
 						rotate_left(x->parent);
 						w = x->parent->right;
 					}
-					if (w->left->type == blackNode && w->right->type == blackNode) {
-						w->type = redNode;
+					if (w->left->type == black_node && w->right->type == black_node) {
+						w->type = red_node;
 						x = x->parent;
-					}
-					else {
-						if (w->right->type == blackNode) {
-							w->left->type = blackNode;
-							w->type = redNode;
+					} else {
+						if (w->right->type == black_node) {
+							w->left->type = black_node;
+							w->type = red_node;
 							rotate_right(w);
 							w = x->parent->right;
 						}
 						w->type = x->parent->type;
-						x->parent->type = blackNode;
-						w->right->type = blackNode;
+						x->parent->type = black_node;
+						w->right->type = black_node;
 						rotate_left(x->parent);
 						x = _head;
 					}
-				}
-				else {
+				} else {
 					pointer w = x->parent->left;
-					if (w->type == redNode) {
-						w->type = blackNode;
-						x->parent->type = redNode;
+					if (w->type == red_node) {
+						w->type = black_node;
+						x->parent->type = red_node;
 						rotate_right(x->parent);
 						w = x->parent->left;
 					}
-					if (w->right->type == blackNode && w->left->type == blackNode) {
-						w->type = redNode;
+					if (w->right->type == black_node && w->left->type == black_node) {
+						w->type = red_node;
 						x = x->parent;
-					}
-					else {
-						if (w->left->type == blackNode) {
-							w->right->type = blackNode;
-							w->type = redNode;
+					} else {
+						if (w->left->type == black_node) {
+							w->right->type = black_node;
+							w->type = red_node;
 							rotate_left(w);
 							w = x->parent->left;
 						}
 						w->type = x->parent->type;
-						x->parent->type = blackNode;
-						w->left->type = blackNode;
+						x->parent->type = black_node;
+						w->left->type = black_node;
 						rotate_right(x->parent);
 						x = _head;
 					}
 				}
 			}
-			if (x->type != nilNode)
-				x->type = blackNode;
+			if (x->type != nil_node)
+				x->type = black_node;
 		}
 
 		void rotate_left(pointer x)
 		{
-
-			/**************************
-			 *  rotate node x to left *
-			 **************************/
-
 			pointer y = x->right;
-
-			/* establish x->right link */
 			x->right = y->left;
-			if (y->left != _nil) y->left->parent = x;
+			if (y->left != _nil)
+                y->left->parent = x;
 
-			/* establish y->parent link */
-			if (y != _nil) y->parent = x->parent;
-			if (x->parent != _nil) {
-				if (x==x->parent->left)
+			if (y != _nil)
+                y->parent = x->parent;
+            if (x->parent == _nil)
+                _head = y;
+            else {
+				if (x == x->parent->left)
 					x->parent->left = y;
 				else
 					x->parent->right = y;
 			}
-			else {
-				_head = y;
-			}
 
-			/* link x and y */
 			y->left = x;
-			if (x != _nil) x->parent = y;
+			if (x != _nil)
+                x->parent = y;
 		}
 
 		void rotate_right(pointer x)
 		{
-
-			/****************************
-			 *  rotate node x to right  *
-			 ****************************/
-
 			pointer y = x->left;
-
-			/* establish x->left link */
 			x->left = y->right;
-			if (y->right != _nil) y->right->parent = x;
+			if (y->right != _nil)
+                y->right->parent = x;
 
-			/* establish y->parent link */
-			if (y != _nil) y->parent = x->parent;
-			if (x->parent != _nil) {
-				if (x==x->parent->right)
+			if (y != _nil)
+                y->parent = x->parent;
+            if (x->parent == _nil)
+                _head = y;
+            else {
+				if (x == x->parent->right)
 					x->parent->right = y;
 				else
 					x->parent->left = y;
 			}
-			else {
-				_head = y;
-			}
 
-			/* link x and y */
 			y->right = x;
-			if (x != _nil) x->parent = y;
+			if (x != _nil)
+                x->parent = y;
 		}
 	};
 }

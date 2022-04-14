@@ -109,7 +109,7 @@ namespace ft {
 
         void erase(iterator first, iterator last)
         {
-            while (first!=last) {
+            for (; first!=last;) {
                 Key key = *first;
                 ++first;
                 _tree.erase(key);

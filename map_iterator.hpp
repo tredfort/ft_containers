@@ -72,7 +72,7 @@ namespace ft {
     private:
         nodePointer maximum(nodePointer node)
         {
-            while (node->right->type != nilNode) {
+            while (node->right->type != nil_node) {
                 node = node->right;
             }
             return node;
@@ -80,7 +80,7 @@ namespace ft {
 
         nodePointer minimum(nodePointer node)
         {
-            while (node->left->type != nilNode) {
+            while (node->left->type != nil_node) {
                 node = node->left;
             }
             return node;
@@ -88,14 +88,14 @@ namespace ft {
 
         nodePointer next(nodePointer node)
         {
-            if (node->type == nilNode)
+            if (node->type == nil_node)
                 return node;
 
-            if (node->right->type != nilNode)
+            if (node->right->type != nil_node)
                 return minimum(node->right);
 
             nodePointer ptr = node->parent;
-            while (ptr->type != nilNode && node == ptr->right) {
+            while (ptr->type != nil_node && node == ptr->right) {
                 node = ptr;
                 ptr = ptr->parent;
             }
@@ -104,19 +104,19 @@ namespace ft {
 
         nodePointer prev(nodePointer node)
         {
-            if (node->type == nilNode)
+            if (node->type == nil_node)
                 return node->parent;
 
-            if (node->type != nilNode && node->left->type != nilNode)
+            if (node->type != nil_node && node->left->type != nil_node)
                 return maximum(node->left);
 
             nodePointer ptr = node->parent;
-            while (ptr->type != nilNode && node == ptr->left) {
+            while (ptr->type != nil_node && node == ptr->left) {
                 node = ptr;
                 ptr = ptr->parent;
             }
 
-            return ptr->type != nilNode ? ptr : node;
+            return ptr->type != nil_node ? ptr : node;
         }
     };
 }
