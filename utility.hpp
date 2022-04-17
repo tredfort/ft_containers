@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <iostream>
+#include "iterator_traits.hpp"
 
 namespace ft {
 	template <class T, class A>
@@ -77,17 +78,21 @@ template< class InputIt1, class InputIt2, class BinaryPredicate >
 	struct pair {
 		typedef T1 first_type;
 		typedef T2 second_type;
-		T1 first;
-		T2 second;
+        first_type first;
+        second_type second;
+
 		pair() : first(), second() {}
-		pair(T1 const& t1, T2 const& t2) : first(t1), second(t2) {}
 
-		template <class U1, class U2>
-		pair(const pair<U1, U2>& p) : first(p.first), second(p.second) {}
+        template <class U1, class U2>
+        pair(const pair<U1, U2>& p) : first(p.first), second(p.second) {}
 
-		pair& operator=(pair const& p) {
-			first = p.first;
-			second = p.second;
+        pair(const first_type& k, const second_type& v) : first(k), second(v) { };
+
+		pair& operator=(const pair& other) {
+			if (this == &other)
+                return *this;
+            first = other.first;
+			second = other.second;
 			return *this;
 		}
 
@@ -127,6 +132,47 @@ template< class InputIt1, class InputIt2, class BinaryPredicate >
 
 	template <class T1, class T2>
 	inline pair<T1, T2> make_pair(T1 x, T2 y) { return pair<T1, T2>(x, y); }
+
+    template <class InputIter>
+    typename std::iterator_traits<InputIter>::difference_type
+    distance(InputIter first, InputIter last, std::input_iterator_tag)
+    {
+        typename std::iterator_traits<InputIter>::difference_type r(0);
+        for (; first != last; ++first)
+            ++r;
+        return r;
+    }
+
+    template <class RandIter>
+    typename std::iterator_traits<RandIter>::difference_type
+    distance(RandIter first, RandIter last, std::random_access_iterator_tag)
+    {
+        return last - first;
+    }
+
+    template <class InputIter>
+    typename ft::iterator_traits<InputIter>::difference_type
+    distance(InputIter first, InputIter last, ft::input_iterator_tag)
+    {
+        typename ft::iterator_traits<InputIter>::difference_type r(0);
+        for (; first != last; ++first)
+            ++r;
+        return r;
+    }
+
+    template <class RandIter>
+    typename ft::iterator_traits<RandIter>::difference_type
+    distance(RandIter first, RandIter last, ft::random_access_iterator_tag)
+    {
+        return last - first;
+    }
+
+    template <class InputIter>
+    typename ft::iterator_traits<InputIter>::difference_type
+    distance(InputIter first, InputIter last)
+    {
+        return distance(first, last, typename ft::iterator_traits<InputIter>::iterator_category());
+    }
 }
 
 namespace std {

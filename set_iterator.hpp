@@ -27,6 +27,8 @@ namespace ft {
 
         set_iterator& operator=(const set_iterator& other)
         {
+            if (this == &other)
+                return *this;
             _ptr = other._ptr;
             return *this;
         }

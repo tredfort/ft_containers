@@ -26,13 +26,13 @@ namespace ft {
 
 		node& operator=(const node& other)
 		{
-			if (this != &other) {
-                type = other.type;
-                parent = other.parent;
-                left = other.left;
-                right = other.right;
-                data = new value_type(other.data->first, other.data->second);
-            }
+			if (this == &other)
+                return *this;
+            type = other.type;
+            parent = other.parent;
+            left = other.left;
+            right = other.right;
+            data = new value_type(other.data->first, other.data->second);
 			return *this;
 		}
 

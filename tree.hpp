@@ -22,37 +22,37 @@ namespace ft {
     private:
 		allocator_type _alloc;
         key_compare _cmp;
-        pointer _head;
+        pointer _root;
         pointer _nil;
 		size_type _size;
 
     public:
-        tree() : _alloc(), _cmp(key_compare()), _head(_alloc.allocate(1)), _nil(_head), _size(0)
+        tree() : _alloc(), _cmp(key_compare()), _root(_alloc.allocate(1)), _nil(_root), _size(0)
         {
             _alloc.construct(_nil, value_type(key_type(), mapped_type(), NULL, nil_node));
         }
 
         ~tree()
         {
-        	clear(_head);
+        	clear(_root);
             free_node(_nil);
         }
 
         tree& operator=(const tree& other)
         {
-            if (this != &other) {
-                clear();
-                _cmp = other._cmp;
-                for (pointer ptr = other.begin(); ptr != other.end(); ptr = next(ptr)) {
-					insert(*ptr->data);
-                }
+            if (this == &other)
+                return *this;
+            clear();
+            _cmp = other._cmp;
+            for (pointer ptr = other.begin(); ptr != other.end(); ptr = next(ptr)) {
+                insert(*ptr->data);
             }
             return *this;
         }
 
-        pointer begin() { return minimum(_head); }
+        pointer begin() { return minimum(_root); }
 
-        pointer begin() const { return minimum(_head); }
+        pointer begin() const { return minimum(_root); }
 
         pointer end() { return _nil; }
 
@@ -62,13 +62,13 @@ namespace ft {
 
 		size_type max_size() const { return _alloc.max_size(); }
 
-        void clear() { clear(_head); }
+        void clear() { clear(_root); }
 
 		ft::pair<pointer, bool> insert(ft::pair<key_type, mapped_type> pair)
         {
             pointer current, parent, new_node;
 
-            for (current = _head, parent = _nil; current != _nil;) {
+            for (current = _root, parent = _nil; current != _nil;) {
                 if (pair.first == current->data->first)
                     return ft::pair<pointer, bool>(current, false);
                 parent = current;
@@ -79,7 +79,7 @@ namespace ft {
             new_node->parent = parent;
 
             if (parent == _nil)
-                _head = new_node;
+                _root = new_node;
             else {
                 if (_cmp(pair.first, parent->data->first))
                     parent->left = new_node;
@@ -88,14 +88,14 @@ namespace ft {
             }
 
             insert_fixup(new_node);
-            _nil->parent = maximum(_head);
+            _nil->parent = maximum(_root);
             ++_size;
             return ft::pair<pointer, bool>(new_node, true);
         }
 
 		bool erase(key_type key)
 		{
-        	pointer node = find(_head, key);
+        	pointer node = find(_root, key);
         	if (node == _nil)
         		return false;
             erase_node(node);
@@ -106,20 +106,20 @@ namespace ft {
 		void swap(tree& other)
 		{
 			std::swap(_nil, other._nil);
-			std::swap(_head, other._head);
+			std::swap(_root, other._root);
 			std::swap(_cmp, other._cmp);
 			std::swap(_alloc, other._alloc);
 			std::swap(_size, other._size);
 		}
 
-        pointer find(key_type key) const { return find(_head, key); }
+        pointer find(key_type key) const { return find(_root, key); }
 
 		pointer lower_bound(const key_type key) const
 		{
-			if (_head != _nil)
+			if (_root != _nil)
 			{
                 pointer node, remembered;
-                for (node = _head, remembered = _head; node != _nil;) {
+                for (node = _root, remembered = _root; node != _nil;) {
                     if (key == node->data->first)
                         return node;
                     if (_cmp(key, node->data->first)) {
@@ -136,10 +136,10 @@ namespace ft {
 
 		pointer upper_bound(const key_type key) const
 		{
-			if (_head != _nil)
+			if (_root != _nil)
 			{
                 pointer node, remembered;
-                for (node = _head, remembered = _head; node != _nil;) {
+                for (node = _root, remembered = _root; node != _nil;) {
                     if (_cmp(key, node->data->first)) {
                         remembered = node;
                         node = node->left;
@@ -217,9 +217,9 @@ namespace ft {
 
 			clear(node->left);
 			clear(node->right);
-			if (node == _head) {
-                free_node(_head);
-                _head = _nil;
+			if (node == _root) {
+                free_node(_root);
+                _root = _nil;
                 _nil->parent = NULL;
 				_size = 0;
 			}
@@ -247,7 +247,7 @@ namespace ft {
                 if (x != _nil)
                     x->parent = y->parent;
                 if (y->parent == _nil)
-                    _head = x;
+                    _root = x;
                 else {
                     if (y == y->parent->left)
                         y->parent->left = x;
@@ -265,13 +265,13 @@ namespace ft {
 
                 _alloc.destroy(y);
                 _alloc.deallocate(y, 1);
-                _nil->parent = maximum(_head);
+                _nil->parent = maximum(_root);
             }
         }
 
 		void insert_fixup(pointer x)
 		{
-            for (; x != _head && x->parent->type == red_node;) {
+            for (; x != _root && x->parent->type == red_node;) {
 				if (x->parent == x->parent->parent->left) {
 					pointer y = x->parent->parent->right;
 					if (y->type == red_node) {
@@ -306,12 +306,12 @@ namespace ft {
 					}
 				}
 			}
-            _head->type = black_node;
+            _root->type = black_node;
 		}
 
 		void delete_fixup(pointer x)
 		{
-            for (; x != _head && x->type == black_node;) {
+            for (; x != _root && x->type == black_node;) {
 				if (x == x->parent->left) {
 					pointer w = x->parent->right;
 					if (w->type == red_node) {
@@ -334,7 +334,7 @@ namespace ft {
 						x->parent->type = black_node;
 						w->right->type = black_node;
 						rotate_left(x->parent);
-						x = _head;
+						x = _root;
 					}
 				} else {
 					pointer w = x->parent->left;
@@ -358,7 +358,7 @@ namespace ft {
 						x->parent->type = black_node;
 						w->left->type = black_node;
 						rotate_right(x->parent);
-						x = _head;
+						x = _root;
 					}
 				}
 			}
@@ -376,7 +376,7 @@ namespace ft {
 			if (y != _nil)
                 y->parent = x->parent;
             if (x->parent == _nil)
-                _head = y;
+                _root = y;
             else {
 				if (x == x->parent->left)
 					x->parent->left = y;
@@ -399,7 +399,7 @@ namespace ft {
 			if (y != _nil)
                 y->parent = x->parent;
             if (x->parent == _nil)
-                _head = y;
+                _root = y;
             else {
 				if (x == x->parent->right)
 					x->parent->right = y;

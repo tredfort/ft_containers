@@ -1,9 +1,9 @@
 #ifndef VECTOR_HPP
 #define VECTOR_HPP
 
+#include "utility.hpp"
 #include <memory>
 #include <iostream>
-#include "utility.hpp"
 #include "vector_iterator.hpp"
 #include "reverse_iterator.hpp"
 
@@ -55,10 +55,10 @@ namespace ft {
 
         vector& operator=(const vector& other)
         {
-            if (*this != other) {
-                clear();
-                insert(begin(), other.begin(), other.end());
-            }
+            if (this == &other)
+                return *this;
+            clear();
+            insert(begin(), other.begin(), other.end());
             return *this;
         }
 
@@ -84,12 +84,18 @@ namespace ft {
 
         void resize(size_type n, value_type value = value_type())
         {
-            if (_size < n)
-                insert(end(), n - _size, value);
+            if (_size > n) {
+                for (; _size > n; --_size)
+                    _alloc.destroy(_ptr + _size - 1);
+            }
             else {
-				for (; _size > n; --_size)
-					_alloc.destroy(_ptr + _size - 1);
-			}
+                if (!_cap || n > 2 * _cap)
+                    reserve(n);
+                else if (n > _cap)
+                    reserve(_cap * 2);
+                for (; _size < n; ++_size)
+                    _alloc.construct(_ptr + _size, value);
+            }
         }
 
         size_type capacity() const { return _cap; }
@@ -105,7 +111,10 @@ namespace ft {
                 size_type new_size = 0;
                 try {
                     new_ptr = _alloc.allocate(new_cap);
-                    move(new_ptr, _ptr, _size, new_size);
+                    for (; new_size < _size; ++new_size)
+                        _alloc.construct(new_ptr + new_size, *(_ptr + new_size));
+                    for (size_type i = 0; i < _size; ++i)
+                        _alloc.destroy(_ptr + i);
                     replacement(new_ptr, new_size, new_cap);
                 } catch (...) {
                     clear(new_ptr, new_size, new_cap);
@@ -143,7 +152,7 @@ namespace ft {
                 typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type last)
         {
             clear();
-            reserve(last - first);
+            reserve(ft::distance(first, last));
             insert(begin(), first, last);
         }
 
@@ -157,9 +166,9 @@ namespace ft {
         void push_back(const value_type& value)
         {
             if (_size == _cap)
-                reserve(_cap ? _cap * 2 : 1);
-            *(_ptr + _size) = value;
-            ++_size;
+                resize(_size + 1, value);
+            else
+                _alloc.construct(_ptr + _size++, value);
         }
 
         void pop_back()
@@ -170,57 +179,59 @@ namespace ft {
 
         iterator insert(iterator position, const value_type& value)
         {
-        	size_type pos = position - begin();
+        	size_type pos = ft::distance(begin(), position);
             insert(position, 1, value);
             return iterator(_ptr + pos);
         }
 
+        //TODO: вместо вызова оператора =, создавать объекты через конструктор копирования
         void insert(iterator position, size_type n, const value_type& value)
         {
-            size_type pos = position - begin();
+            size_type pos = ft::distance(begin(), position);
             size_type new_size = 0;
             size_type new_cap;
             pointer new_ptr;
 
             if (_size + n > _cap) {
-                new_cap = _cap == 0 ? n : _cap * 2 < n ? _size + n : _cap * 2;
+                new_cap = !_cap ? n : _cap * 2 < n + _size ? _size + n : _cap * 2;
                 check_max_size(new_cap);
                 try {
                     new_ptr = _alloc.allocate(new_cap);
                     for (; new_size < n; ++new_size)
                         _alloc.construct(new_ptr + pos + new_size, value);
                     move(new_ptr, _ptr, pos, new_size);
-                    move(new_ptr + pos + n, _ptr + pos, end() - position, new_size);
+                    move(new_ptr + pos + n, _ptr + pos, ft::distance(position, end()), new_size);
                     replacement(new_ptr, new_size, new_cap);
                 } catch (...) {
                     clear(new_ptr + pos, new_size, new_cap);
                     throw;
                 }
             } else {
-                move_reverse(_ptr + _size - 1 + n, _ptr + _size - 1, end() - position);
+                move_reverse(_ptr + _size - 1 + n, _ptr + _size - 1, ft::distance(position, end()));
                 for (size_type i = 0; i < n; ++i, ++_size)
                     _alloc.construct(_ptr + pos + i, value);
             }
         }
 
+        //TODO: вместо вызова оператора =, создавать объекты через конструктор копирования
         template<class InputIterator>
         void insert(
                 iterator position,
                 InputIterator first,
                 typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type last) {
-            size_type n = last - first;
-            size_type pos = position - begin();
-            size_type new_size = 0;
-            size_type new_cap;
-            pointer new_ptr;
+            size_type n = ft::distance(first, last);
+            size_type pos = ft::distance(begin(), position);
+            size_type new_size(0);
+            size_type new_cap(0);
+            pointer new_ptr(0);
 
             if (_size + n > _cap) {
                 new_cap = _cap == 0 ? n : _cap * 2 < _size + n ? _size + n : _cap * 2;
                 check_max_size(new_cap);
                 try {
                     new_ptr = _alloc.allocate(new_cap);
-                    for (; new_size < n; ++new_size)
-                        _alloc.construct(new_ptr + pos + new_size, *(first + new_size));
+                    for (; new_size < n; ++new_size, ++first)
+                        _alloc.construct(new_ptr + pos + new_size, *first);
                     move(new_ptr, _ptr, pos, new_size);
                     move(new_ptr + pos + n, _ptr + pos, end() - position, new_size);
                     replacement(new_ptr, new_size, new_cap);
@@ -230,8 +241,8 @@ namespace ft {
                 }
             } else {
                 move_reverse(_ptr + _size - 1 + n, _ptr + _size - 1, end() - position);
-                for (size_type i = 0; i < n; ++i, ++_size)
-                    _alloc.construct(_ptr + pos + i, *(first + i));
+                for (size_type i = 0; i < n; ++i, ++_size, ++first)
+                    _alloc.construct(_ptr + pos + i, *first);
             }
         }
 
@@ -239,10 +250,11 @@ namespace ft {
 
         iterator erase(iterator first, iterator last)
         {
-            size_type n = last - first;
-            for (size_type i = 0, pos_end = end() - last; i < pos_end; ++i) {
-                if (i < n)
-                    _alloc.destroy(first.base() + i);
+            size_type n = ft::distance(first, last);
+            for (size_type i = 0; i < n; ++i) {
+                _alloc.destroy(first.base() + i);
+            }
+            for (size_type i = 0, remains = ft::distance(last, end()); i < remains; ++i) {
                 *(first.base() + i) = *(last.base() + i);
             }
             _size -= n;
@@ -274,7 +286,7 @@ namespace ft {
                 throw std::length_error("vector");
         }
 
-        void check_range(size_type n)
+        void check_range(size_type n) const
         {
             if (n > size())
                 throw std::out_of_range("vector");

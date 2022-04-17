@@ -57,6 +57,8 @@ namespace ft {
 
         set& operator=(const set& other)
         {
+            if (this == &other)
+                return *this;
             _tree = other._tree;
             _alloc = other._alloc;
             _key_compare = other._key_compare;
